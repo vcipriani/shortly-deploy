@@ -8,7 +8,7 @@
   "private": true,
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
-    "bluebird": "1.0.8",
+    "bluebird": "^1.0.8",
     "bookshelf": "^0.9.1",
     "chai": "^1.9.0",
     "ejs": "~0.8.5",

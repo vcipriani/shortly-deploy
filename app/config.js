@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 
+mongoose.connect('localhost', 'shortly');
+
 exports.User = mongoose.Schema({
   username: {type: 'String', unique: true},
   password: {type: 'String'}  
