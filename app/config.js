@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 var crypto = require('crypto');
+var bcrypt = require('bcrypt-nodejs');
+var Promise = require('bluebird');
 
 mongoose.connect('localhost', 'shortly');
 
@@ -7,6 +9,21 @@ exports.User = mongoose.Schema({
   username: {type: 'String', unique: true},
   password: {type: 'String'}  
 }, {timestamps: true});
+
+exports.User.methods.comparePassword = function(attemptedPassword, callback) {
+  bcrypt.compare(attemptedPassword, this.password, function(err, isMatch) {
+    callback(isMatch);
+  });
+};
+
+exports.User.pre('save', function(next) {
+  var cipher = Promise.promisify(bcrypt.hash);
+  cipher(this.password, null, null).bind(this)
+    .then(function(hash) {
+      this.password = hash;
+      next();
+    });
+});
 
 exports.Link = mongoose.Schema({
   url: {type:'String'},
@@ -23,6 +40,7 @@ exports.Link.pre('save', function(next) {
   next();
 });
 
+
 // db.knex.schema.hasTable('urls').then(function(exists) {
 //   if (!exists) {
 //     db.knex.schema.createTable('urls', function (link) {
@@ -33,7 +51,7 @@ exports.Link.pre('save', function(next) {
 //       link.string('title', 255);
 //       link.integer('visits');
 //       link.timestamps();
-//     }).then(function (table) {
+//     }).then(function user(table) {
 //       console.log('Created Table', table);
 //     });
 //   }

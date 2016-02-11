@@ -2,6 +2,12 @@
 var mongoose = require('mongoose');
 var schema = require('../config.js');
 
+mongoose.model.prototype.comparePassword = function(attemptedPassword, callback) {
+  bcrypt.compare(attemptedPassword, this.password, function(err, isMatch) {
+    callback(isMatch);
+  });
+};
+
 module.exports = mongoose.model('User',schema.User);
 
 // var db = require('../config');
