@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var crypto = require('crypto');
 
 mongoose.connect('localhost', 'shortly');
 
@@ -15,6 +16,12 @@ exports.Link = mongoose.Schema({
   visits: {type:'Number'}
 }, {timestamps: true});
 
+exports.Link.pre('save', function(next) {
+  var shasum = crypto.createHash('sha1');
+  shasum.update(this.url);
+  this.code = shasum.digest('hex').slice(0, 5);
+  next();
+});
 
 // db.knex.schema.hasTable('urls').then(function(exists) {
 //   if (!exists) {
