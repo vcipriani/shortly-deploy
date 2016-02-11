@@ -64,11 +64,18 @@ module.exports = function(grunt) {
     },
 
     shell: {
-      prodServer: {
-        command: ['git push live master' , 'open http://104.236.169.203'].join('&&')
+      options: { stdout: true },
+      pushToProd: {
+        command: 'git push live master'
       },
-      devServer: {
-        command:['git push origin master', 'open http://127.0.0.1:4568'].join('&&')
+      pushToDev: {
+        command: 'git push origin master'
+      },
+      openToProd: {
+        command: 'open http://104.236.169.203:4568'
+      },
+      openToDev: {
+        command: 'open http://127.0.0.1:4568'
       }
     }
   });
@@ -107,14 +114,19 @@ module.exports = function(grunt) {
 
   grunt.registerTask('upload', function(n) {
     if (grunt.option('prod')) {
-      // add your production server task here
-      grunt.task.run(['deploy']);
+      grunt.task.run('shell:pushToProd');
     } else {
-      grunt.task.run([ 'server-dev' ]);
+      grunt.task.run('shell:pushToDev');
     }
   });
 
-  grunt.registerTask('deploy', ['build','shell:prodServer']);
+  grunt.registerTask('deploy', function(){
+    if (grunt.option('prod')) {
+      grunt.task.run(['build','test','upload', 'shell:openToProd']);
+    } else {
+      grunt.task.run(['build','test', 'server-dev', 'shell:openToDev', 'nodemon']);
+    }
+  });
 
 
 };
